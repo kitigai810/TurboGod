@@ -1,7 +1,7 @@
 const {systemPreferences, dialog} = require('electron');
 const {translate} = require('./l10n');
 const {APP_NAME} = require('./brand');
-
+//za
 const showPermissionDeniedWarning = (window, mediaType) => {
   const title = translate(`permission.${mediaType}-denied`);
   const description = translate(`permission.${mediaType}-denied-description`);
