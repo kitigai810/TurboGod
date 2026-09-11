@@ -44,7 +44,43 @@ app.commandLine.appendSwitch('host-resolver-rules', 'MAP device-manager.scratch.
 // The underlying issue of inert <img> creating excessive task queues remains,
 // so we can still get some stutters occasionally, but this reduces it a fair bit.
 // The possible loss in input latency is tolerable due to the performance impact.
-app.commandLine.appendSwitch('disable-features', 'DeferRendererTasksAfterInput');
+app.commandLine.appendSwitch('disable-features', [
+  'DeferRendererTasksAfterInput',
+  // Disable throttling on background tabs / hidden pages so the VM loop
+  // never gets starved when another window steals focus.
+  'IntensiveWakeUpThrottling',
+  // Reduce IPC overhead between browser and renderer processes.
+  'UseSkiaRenderer',
+].join(','));
+
+// -----------------------------------------------------------------------
+// GPU / compositor performance flags
+// -----------------------------------------------------------------------
+
+// Tell the GPU process to use maximum performance mode (avoids power-saving
+// downclocks that cut throughput in half on integrated GPUs).
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy');
+
+// Allow Chromium to use more CPU threads for rasterization.
+// Default is 1; 4 covers most quad-core machines without over-subscribing.
+app.commandLine.appendSwitch('num-raster-threads', '4');
+
+// Keep the compositor frame rate uncapped.  Without this, Chrome caps the
+// frame rate to the display's refresh rate even when vsync is off.
+app.commandLine.appendSwitch('disable-frame-rate-limit');
+
+// Skip the vsync wait so frames are submitted as fast as the GPU can handle
+// them.  Removes the most common single cause of the 25 → 30 FPS ceiling.
+app.commandLine.appendSwitch('disable-gpu-vsync');
+
+// Disable background tab throttling so the Scratch VM step loop is never
+// throttled even when the editor window is in the background.
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+
+// Force the GPU compositing path to stay on even when the window is occluded.
+app.commandLine.appendSwitch('disable-raf-throttling');
 
 if (!settings.hardwareAcceleration) {
   app.disableHardwareAcceleration();

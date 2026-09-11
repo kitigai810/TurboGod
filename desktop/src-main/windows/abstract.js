@@ -179,6 +179,10 @@ class AbstractWindow {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
+      // Prevent Chromium from throttling timers / rAF when the window is in
+      // the background or partially occluded.  This keeps the Scratch VM step
+      // loop running at full speed regardless of window focus state.
+      backgroundThrottling: false,
     };
 
     const preloadName = this.getPreload();

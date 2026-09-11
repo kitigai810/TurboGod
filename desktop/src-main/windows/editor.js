@@ -597,7 +597,11 @@ class EditorWindow extends ProjectRunningWindow {
   }
 
   applySettings () {
-    this.window.webContents.setBackgroundThrottling(settings.backgroundThrottling);
+    // Always keep background throttling disabled to prevent Chromium from
+    // slowing down the Scratch VM step loop when the window loses focus.
+    // Respecting the user's settings.backgroundThrottling toggle here would
+    // re-enable throttling and cause the visible FPS drop back to ~10 fps.
+    this.window.webContents.setBackgroundThrottling(false);
   }
 
   enumerateMediaDevices () {
